@@ -8,7 +8,7 @@ $installerAst = [Management.Automation.Language.Parser]::ParseInput($installerTe
 if ($parseErrors.Count) { throw ($parseErrors | Out-String) }
 $functionNames = @(
     'Require-File', 'Get-BackupRoot', 'New-BackupSet', 'Get-RelativeResourcePath', 'Backup-ModifiedFile',
-    'Get-FrontendJsFilesContaining', 'Register-Language', 'Patch-LanguageDisplayNames',
+    'Get-FrontendJsFilesContaining', 'Register-Language', 'Unregister-Language', 'Patch-LanguageDisplayNames',
     'Get-FrontendHardcodedReplacements', 'Test-PlainUiTextReplacement', 'Test-StructuralJsReplacement',
     'Test-StructuralJsLiteralContext', 'Replace-FrontendHardcodedText', 'Patch-HardcodedFrontendStrings'
 )

@@ -160,5 +160,24 @@ Test-Case 'label shim skips safely when no relevant bundle exists' {
     Assert-Equal ([IO.File]::ReadAllText($p)) 'const unrelated=true;' 'unrelated changed'
     Assert-Equal (Test-Path (Join-Path $r '.zh-cn-backups')) $false 'unnecessary backup'
 }
+Test-Case 'unregistration removes whitelist entries and skips unrelated files' {
+    $r = New-Fixture
+    $original = 'const a=' + $BaseLanguageList + ',"zh-CN"];const b=' + $BaseLanguageList + ',"zh-TW"];'
+    $p = Write-Js $r 'language.js' $original
+    $u = Write-Js $r 'unrelated.js' 'const untouched=true;'
+    $stamp = [IO.File]::GetLastWriteTimeUtc($u)
+    Unregister-Language $r
+    $expected = 'const a=' + $BaseLanguageList + '];const b=' + $BaseLanguageList + '];'
+    Assert-Equal ([IO.File]::ReadAllText($p)) $expected 'whitelist entries not removed'
+    Assert-Equal ([IO.File]::GetLastWriteTimeUtc($u)) $stamp 'unrelated file rewritten'
+}
+Test-Case 'unregistration skips safely when no matching bundles exist' {
+    $r = New-Fixture
+    $p = Write-Js $r 'unrelated.js' 'const unrelated=true;'
+    $stamp = [IO.File]::GetLastWriteTimeUtc($p)
+    Unregister-Language $r
+    Assert-Equal ([IO.File]::ReadAllText($p)) 'const unrelated=true;' 'unrelated changed'
+    Assert-Equal ([IO.File]::GetLastWriteTimeUtc($p)) $stamp 'unrelated file rewritten'
+}
 Write-Host "RESULT passed=$script:Passed failed=$script:Failed PowerShell=$($PSVersionTable.PSVersion) fallback=$ForceFallback fixtures=$WorkRoot"
 if ($script:Failed) { exit 1 }
