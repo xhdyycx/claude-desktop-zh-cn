@@ -179,5 +179,11 @@ Test-Case 'unregistration skips safely when no matching bundles exist' {
     Assert-Equal ([IO.File]::ReadAllText($p)) 'const unrelated=true;' 'unrelated changed'
     Assert-Equal ([IO.File]::GetLastWriteTimeUtc($p)) $stamp 'unrelated file rewritten'
 }
+Test-Case 'unregistration exits gracefully when assets dir is missing' {
+    $r = Join-Path $WorkRoot 'fixture-missing-assets'
+    New-Item -ItemType Directory -Path $r -Force | Out-Null
+    Unregister-Language $r
+    Assert-Equal $true $true 'unregister threw on missing assets dir'
+}
 Write-Host "RESULT passed=$script:Passed failed=$script:Failed PowerShell=$($PSVersionTable.PSVersion) fallback=$ForceFallback fixtures=$WorkRoot"
 if ($script:Failed) { exit 1 }
